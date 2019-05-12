@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Bunifu.Framework.UI;
+using System.Runtime.InteropServices;
 
 namespace MonitorBrightness
 {
     public partial class Form1 : Form
     {
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
 
         BrightnessControl brightnessControl = new BrightnessControl();
 
@@ -21,9 +19,8 @@ namespace MonitorBrightness
             InitializeComponent();
             Rectangle screen = Screen.PrimaryScreen.WorkingArea;
             
-
             int h = 0;
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < brightnessControl.GetMonitors(); i++)
             {
                 var brightnessInfo = brightnessControl.GetBrightnessCapabilities(i);
                 var sliderControl = new BunifuSlider
@@ -36,6 +33,7 @@ namespace MonitorBrightness
                     Value = brightnessInfo.current,
                     MaximumValue = brightnessInfo.maximum
                 };
+                sliderControl.MouseWheel += SliderControl_MouseWheel;
                 sliderControl.ValueChanged += SliderControl_ValueChanged;
                 flowLayoutPanel1.Controls.Add(sliderControl);
                 h += 25;
@@ -43,6 +41,16 @@ namespace MonitorBrightness
             this.Size = new Size(this.Size.Width, this.Size.Height + h);
             Point newLocation = new Point(screen.Width - this.Size.Width, screen.Height - this.Size.Height);
             Location = newLocation;
+        }
+
+        private void SliderControl_MouseWheel(object sender, MouseEventArgs e)
+        {
+            BunifuSlider ctl = sender as BunifuSlider;
+            int value = ctl.Value + (5 * e.Delta / 120);
+            if (value > ctl.MaximumValue || value < 0) return;
+            ctl.Value = value;
+            SliderControl_ValueChanged(sender, null);
+
         }
 
         int current = 0;
@@ -54,25 +62,35 @@ namespace MonitorBrightness
             {
                 current = ct.Value;
                 brightnessControl.SetBrightness((short)ct.Value, id);
-                //Console.WriteLine(ct.Value);
             }
-            
-        }
-
-        private void Form1_Deactivate(object sender, EventArgs e)
-        {
-            timer1.Start();
-        }
-
-        private void notifyIcon1_Click(object sender, EventArgs e)
-        {
-            Show();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            timer1.Stop();
+            if (GetForegroundWindow() != Handle)
+            {
+                Hide();
+            }
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                BringToFront();
+                Show();
+            }
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
             Hide();
+            timer2.Stop();
         }
     }
 }

@@ -20,12 +20,13 @@ namespace MonitorBrightness
         public void SetupMonitors()
         {
             monitors.Clear();
+#if DEBUG
             if (NativeCalls.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, Callb, 0))
                 Console.WriteLine("You have {0} monitors", monCount);
             else
                 Console.WriteLine("An error occured while enumerating monitors");
         }
-
+#endif
         private static bool Callb(IntPtr hMonitor, IntPtr hDC, ref NativeStructures.Rect prect, int d)
         {
             //monitors.Add(hMonitor);
@@ -46,19 +47,19 @@ namespace MonitorBrightness
             return ++monCount > 0;
         }
 
-        private static void GetMonitorCapabilities(int monitorNumber)
-        {
-            uint pdwMonitorCapabilities = 0u;
-            uint pdwSupportedColorTemperatures = 0u;
-            var monitorCapabilities = NativeCalls.GetMonitorCapabilities(monitors[monitorNumber], ref pdwMonitorCapabilities, ref pdwSupportedColorTemperatures);
-            Debug.WriteLine(pdwMonitorCapabilities);
-            Debug.WriteLine(pdwSupportedColorTemperatures);
-            int lastWin32Error = Marshal.GetLastWin32Error();
-            NativeStructures.MC_DISPLAY_TECHNOLOGY_TYPE type = NativeStructures.MC_DISPLAY_TECHNOLOGY_TYPE.MC_SHADOW_MASK_CATHODE_RAY_TUBE;
-            var monitorTechnologyType = NativeCalls.GetMonitorTechnologyType(monitors[monitorNumber], ref type);
-            Debug.WriteLine(type);
-            lastWin32Error = Marshal.GetLastWin32Error();
-        }
+        //private static void GetMonitorCapabilities(int monitorNumber)
+        //{
+        //    uint pdwMonitorCapabilities = 0u;
+        //    uint pdwSupportedColorTemperatures = 0u;
+        //    var monitorCapabilities = NativeCalls.GetMonitorCapabilities(monitors[monitorNumber], ref pdwMonitorCapabilities, ref pdwSupportedColorTemperatures);
+        //    Debug.WriteLine(pdwMonitorCapabilities);
+        //    Debug.WriteLine(pdwSupportedColorTemperatures);
+        //    int lastWin32Error = Marshal.GetLastWin32Error();
+        //    NativeStructures.MC_DISPLAY_TECHNOLOGY_TYPE type = NativeStructures.MC_DISPLAY_TECHNOLOGY_TYPE.MC_SHADOW_MASK_CATHODE_RAY_TUBE;
+        //    var monitorTechnologyType = NativeCalls.GetMonitorTechnologyType(monitors[monitorNumber], ref type);
+        //    Debug.WriteLine(type);
+        //    lastWin32Error = Marshal.GetLastWin32Error();
+        //}
 
         public bool SetBrightness(short brightness, int monitorNumber)
         {
@@ -77,11 +78,11 @@ namespace MonitorBrightness
             return new BrightnessInfo { minimum = minimum, maximum = maximum, current = current};
         }
 
-        public void DestroyMonitors(uint pdwNumberOfPhysicalMonitors, NativeStructures.PHYSICAL_MONITOR[] pPhysicalMonitorArray)
-        {
-            var destroyPhysicalMonitors = NativeCalls.DestroyPhysicalMonitors(pdwNumberOfPhysicalMonitors, pPhysicalMonitorArray);
-            int lastWin32Error = Marshal.GetLastWin32Error();
-        }
+        //public void DestroyMonitors(uint pdwNumberOfPhysicalMonitors, NativeStructures.PHYSICAL_MONITOR[] pPhysicalMonitorArray)
+        //{
+        //    var destroyPhysicalMonitors = NativeCalls.DestroyPhysicalMonitors(pdwNumberOfPhysicalMonitors, pPhysicalMonitorArray);
+        //    int lastWin32Error = Marshal.GetLastWin32Error();
+        //}
 
         public uint GetMonitors()
         {
