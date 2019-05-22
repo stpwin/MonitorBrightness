@@ -22,11 +22,14 @@ namespace MonitorBrightness
             monitors.Clear();
 #if DEBUG
             if (NativeCalls.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, Callb, 0))
+
                 Console.WriteLine("You have {0} monitors", monCount);
             else
                 Console.WriteLine("An error occured while enumerating monitors");
-        }
+#else
+            NativeCalls.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, Callb, 0);
 #endif
+        }
         private static bool Callb(IntPtr hMonitor, IntPtr hDC, ref NativeStructures.Rect prect, int d)
         {
             //monitors.Add(hMonitor);
