@@ -66,7 +66,7 @@ namespace MonitorBrightness
 
         public bool SetBrightness(short brightness, int monitorNumber)
         {
-            var brightnessWasSet = NativeCalls.SetMonitorBrightness(monitors[monitorNumber], (short)brightness);
+            var brightnessWasSet = NativeCalls.SetMonitorBrightness(monitors[monitorNumber], brightness);
             //if (brightnessWasSet)
             //    Debug.WriteLine("Brightness set to " + (short)brightness);
             int lastWin32Error = Marshal.GetLastWin32Error();
